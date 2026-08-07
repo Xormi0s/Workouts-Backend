@@ -16,7 +16,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class ApplicationUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,7 +50,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
+        return "ApplicationUser{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", enabled=" + enabled +

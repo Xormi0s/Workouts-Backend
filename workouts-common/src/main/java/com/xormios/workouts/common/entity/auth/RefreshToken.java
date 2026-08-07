@@ -1,6 +1,6 @@
 package com.xormios.workouts.common.entity.auth;
 
-import com.xormios.workouts.common.entity.User;
+import com.xormios.workouts.common.entity.ApplicationUser;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,7 +27,7 @@ public class RefreshToken {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "application_user_id", nullable = false)
-    private User user;
+    private ApplicationUser applicationUser;
 
     @Column(nullable = false)
     private LocalDateTime expiresAt;
