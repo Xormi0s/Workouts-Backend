@@ -1,4 +1,4 @@
-package com.xormios.workouts.security;
+package com.xormios.workouts.common.constant;
 
 public class RoleNames {
 
