@@ -23,7 +23,7 @@ public class RefreshToken {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String token;
+    private String tokenHash;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "application_user_id", nullable = false)

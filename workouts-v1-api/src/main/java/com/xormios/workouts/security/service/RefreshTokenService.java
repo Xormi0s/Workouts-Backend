@@ -7,6 +7,9 @@ import com.xormios.workouts.security.config.JwtProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -20,13 +23,17 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProperties jwtProperties;
 
-    public RefreshToken createRefreshToken(ApplicationUser applicationUser) {
+    public String createRefreshToken(ApplicationUser applicationUser) {
+        String rawToken = generateToken();
+
         RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setToken(generateToken());
+        refreshToken.setTokenHash(hashToken(rawToken));
         refreshToken.setApplicationUser(applicationUser);
         refreshToken.setExpiresAt(LocalDateTime.now().plus(jwtProperties.getRefreshTokenExpirationMs(), ChronoUnit.MILLIS));
         refreshToken.setRevoked(false);
-        return refreshTokenRepository.save(refreshToken);
+        refreshTokenRepository.save(refreshToken);
+
+        return rawToken;
     }
 
     private String generateToken() {
@@ -37,7 +44,7 @@ public class RefreshTokenService {
     }
 
     public Optional<RefreshToken> findByToken(String token) {
-        return refreshTokenRepository.findByToken(token);
+        return refreshTokenRepository.findByTokenHash(hashToken(token));
     }
 
     public void revokeAllForUser(ApplicationUser applicationUser) {
@@ -46,5 +53,15 @@ public class RefreshTokenService {
 
     public RefreshToken save(RefreshToken refreshToken) {
         return refreshTokenRepository.save(refreshToken);
+    }
+
+    private String hashToken(String rawToken) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(rawToken.getBytes(StandardCharsets.UTF_8));
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 algorithm not found", e);
+        }
     }
 }

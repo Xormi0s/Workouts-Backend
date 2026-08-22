@@ -70,8 +70,8 @@ public class AuthService {
 
     private AuthResponse issueToken(ApplicationUser user) {
         String accessToken = jwtService.generateAccessToken(user);
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
-        return new AuthResponse(accessToken, refreshToken.getToken(), (jwtProperties.getAccessTokenExpirationMs() / 1000));
+        String refreshToken = refreshTokenService.createRefreshToken(user);
+        return new AuthResponse(accessToken, refreshToken, (jwtProperties.getAccessTokenExpirationMs() / 1000));
     }
 
     public AuthResponse refresh(RefreshRequest refreshRequest) {
