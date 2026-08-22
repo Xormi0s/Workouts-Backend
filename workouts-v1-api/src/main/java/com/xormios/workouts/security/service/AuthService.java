@@ -8,11 +8,7 @@ import com.xormios.workouts.common.repository.RoleRepository;
 import com.xormios.workouts.common.repository.UserRepository;
 import com.xormios.workouts.security.config.AccountLockoutProperties;
 import com.xormios.workouts.security.config.JwtProperties;
-import com.xormios.workouts.security.dto.AuthResponse;
-import com.xormios.workouts.security.dto.LoginRequest;
-import com.xormios.workouts.security.dto.LogoutRequest;
-import com.xormios.workouts.security.dto.RefreshRequest;
-import com.xormios.workouts.security.dto.RegisterRequest;
+import com.xormios.workouts.security.dto.*;
 import com.xormios.workouts.security.exception.TokenRefreshException;
 import com.xormios.workouts.security.exception.UsernameAlreadyExistsException;
 import jakarta.transaction.Transactional;
@@ -94,7 +90,7 @@ public class AuthService {
 
         if(existing.isRevoked()){
             refreshTokenService.revokeAllForUser(existing.getApplicationUser());
-            throw new TokenRefreshException("Refresh token reuse detected, all sessions are revoked");
+            throw new TokenRefreshException("Refresh token has been revoked");
         }
 
         if(existing.getExpiresAt().isBefore(LocalDateTime.now())) {
@@ -141,5 +137,25 @@ public class AuthService {
             user.setFailedLoginAttempts(0);
             userRepository.save(user);
         }
+    }
+
+    public void logoutAll(String username) {
+        ApplicationUser user = userRepository.findByUsername(username).
+                orElseThrow(() -> new IllegalArgumentException("Username not found: " + username));
+        refreshTokenService.revokeAllForUser(user);
+    }
+
+    public void changePassword(String username, ChangePasswordRequest request) {
+        ApplicationUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Username not found: " + username));
+
+        if(!passwordEncoder.matches(request.oldPassword(), user.getPassword())){
+            throw new BadCredentialsException("Current password is incorrect.");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+
+        refreshTokenService.revokeAllForUser(user);
     }
 }
