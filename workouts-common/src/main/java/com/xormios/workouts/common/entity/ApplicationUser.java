@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -47,6 +48,11 @@ public class ApplicationUser {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+
+    @Column(nullable = false)
+    private int failedLoginAttempts = 0;
+
+    private LocalDateTime lockedAt;
 
     @Override
     public String toString() {

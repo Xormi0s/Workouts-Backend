@@ -6,6 +6,7 @@ import com.xormios.workouts.common.constant.RoleNames;
 import com.xormios.workouts.common.entity.auth.Role;
 import com.xormios.workouts.common.repository.RoleRepository;
 import com.xormios.workouts.common.repository.UserRepository;
+import com.xormios.workouts.security.config.AccountLockoutProperties;
 import com.xormios.workouts.security.config.JwtProperties;
 import com.xormios.workouts.security.dto.AuthResponse;
 import com.xormios.workouts.security.dto.LoginRequest;
@@ -18,6 +19,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 @Service
-@Transactional
+@Transactional(dontRollbackOn = BadCredentialsException.class)
 @AllArgsConstructor
 public class AuthService {
 
@@ -36,6 +38,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final JwtProperties jwtProperties;
+    private final AccountLockoutProperties accountLockoutProperties;
 
     public AuthResponse register(RegisterRequest registerRequest) {
         if(userRepository.existsByUsername(registerRequest.username())){
@@ -59,11 +62,22 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest loginRequest) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()));
+        ApplicationUser user = userRepository.findByUsername(loginRequest.username()).orElse(null);
 
-        ApplicationUser user = userRepository.findByUsername(loginRequest.username())
-                .orElseThrow(() -> new IllegalStateException("Authenticated user not found: " + loginRequest.username()));
+        if(user != null){
+            unlockIfExpired(user);
+        }
 
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()));
+        } catch (BadCredentialsException e) {
+            if(user != null){
+                registerFailedLogin(user);
+            }
+            throw e;
+        }
+
+        resetFailedAttempts(user);
         return issueToken(user);
     }
 
@@ -102,5 +116,30 @@ public class AuthService {
                     refreshToken.setRevoked(true);
                     refreshTokenService.save(refreshToken);
                 });
+    }
+
+    private void unlockIfExpired(ApplicationUser user){
+        if(user.isLocked() && user.getLockedAt() != null && user.getLockedAt().plusMinutes(accountLockoutProperties.getLockoutDurationMinutes()).isBefore(LocalDateTime.now())){
+            user.setLocked(false);
+            user.setFailedLoginAttempts(0);
+            user.setLockedAt(null);
+            userRepository.save(user);
+        }
+    }
+
+    private void registerFailedLogin(ApplicationUser user){
+        user.setFailedLoginAttempts(user.getFailedLoginAttempts() + 1);
+        if (user.getFailedLoginAttempts() >= accountLockoutProperties.getMaxAttempts()) {
+            user.setLocked(true);
+            user.setLockedAt(LocalDateTime.now());
+        }
+        userRepository.save(user);
+    }
+
+    private void resetFailedAttempts(ApplicationUser user){
+        if (user.getFailedLoginAttempts() > 0) {
+            user.setFailedLoginAttempts(0);
+            userRepository.save(user);
+        }
     }
 }
