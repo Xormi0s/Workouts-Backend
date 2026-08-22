@@ -6,7 +6,7 @@ import com.xormios.workouts.common.constant.RoleNames;
 import com.xormios.workouts.common.entity.auth.Role;
 import com.xormios.workouts.common.repository.RoleRepository;
 import com.xormios.workouts.common.repository.UserRepository;
-import com.xormios.workouts.security.JwtProperties;
+import com.xormios.workouts.security.config.JwtProperties;
 import com.xormios.workouts.security.dto.AuthResponse;
 import com.xormios.workouts.security.dto.LoginRequest;
 import com.xormios.workouts.security.dto.LogoutRequest;

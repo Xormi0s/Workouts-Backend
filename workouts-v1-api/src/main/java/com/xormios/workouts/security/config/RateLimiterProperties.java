@@ -1,4 +1,4 @@
-package com.xormios.workouts.security;
+package com.xormios.workouts.security.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,17 +7,16 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-
 @Component
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ConfigurationProperties(prefix = "jwt")
-public class JwtProperties {
+@ConfigurationProperties(prefix = "rate-limit")
+public class RateLimiterProperties {
 
-    private String secret;
-    private long accessTokenExpirationMs;
-    private long refreshTokenExpirationMs;
+    private int loginCapacity;
+    private long loginRefillPeriodSeconds;
+    private int registerCapacity;
+    private long registerRefillPeriodSeconds;
 }

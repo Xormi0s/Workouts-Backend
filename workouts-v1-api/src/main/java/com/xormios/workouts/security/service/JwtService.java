@@ -2,7 +2,7 @@ package com.xormios.workouts.security.service;
 
 import com.xormios.workouts.common.entity.ApplicationUser;
 import com.xormios.workouts.common.entity.auth.Role;
-import com.xormios.workouts.security.JwtProperties;
+import com.xormios.workouts.security.config.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;

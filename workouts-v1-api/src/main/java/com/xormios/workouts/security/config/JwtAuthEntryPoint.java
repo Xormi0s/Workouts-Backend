@@ -1,4 +1,4 @@
-package com.xormios.workouts.security;
+package com.xormios.workouts.security.config;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

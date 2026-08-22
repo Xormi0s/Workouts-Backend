@@ -3,7 +3,7 @@ package com.xormios.workouts.security.service;
 import com.xormios.workouts.common.entity.ApplicationUser;
 import com.xormios.workouts.common.entity.auth.RefreshToken;
 import com.xormios.workouts.common.repository.RefreshTokenRepository;
-import com.xormios.workouts.security.JwtProperties;
+import com.xormios.workouts.security.config.JwtProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
