@@ -1,4 +1,4 @@
-package com.xormios.workouts.common.repository;
+package com.xormios.workouts.common.repository.auth;
 
 import com.xormios.workouts.common.entity.ApplicationUser;
 import com.xormios.workouts.common.entity.auth.RefreshToken;

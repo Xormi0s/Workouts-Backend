@@ -2,7 +2,7 @@ package com.xormios.workouts.common.seeder;
 
 import com.xormios.workouts.common.constant.RoleNames;
 import com.xormios.workouts.common.entity.auth.Role;
-import com.xormios.workouts.common.repository.RoleRepository;
+import com.xormios.workouts.common.repository.auth.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

@@ -1,7 +1,7 @@
 package com.xormios.workouts.security.service;
 
 import com.xormios.workouts.common.entity.ApplicationUser;
-import com.xormios.workouts.common.repository.UserRepository;
+import com.xormios.workouts.common.repository.auth.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
