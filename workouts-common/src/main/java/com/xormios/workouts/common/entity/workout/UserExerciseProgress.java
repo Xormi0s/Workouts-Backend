@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -36,5 +37,6 @@ public class UserExerciseProgress {
     @Column(nullable = false)
     private int lastReps;
 
+    @UpdateTimestamp
     private LocalDateTime lastPerformedAt;
 }
